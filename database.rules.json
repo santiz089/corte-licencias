@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "modulos": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}
