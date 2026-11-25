@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captura · Licencias Félix Cuevas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#141822; --panel2:#1b2030; --line:rgba(255,255,255,.1); --ink:#f6f8fc; --muted:rgba(246,248,252,.62); --dim:rgba(246,248,252,.35);
+    --neon:#2be4f2; --warm:#ff3d70; --verde:#17e8a4; --morada:#ac82ff; --yellow:#ffc22e;
+    --font-d:'Outfit',sans-serif; --font-b:'Plus Jakarta Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-b);background:radial-gradient(ellipse 900px 600px at 10% -10%,rgba(43,228,242,.08),transparent 60%),radial-gradient(ellipse 900px 700px at 100% 110%,rgba(172,130,255,.1),transparent 60%),var(--bg);color:var(--ink);min-height:100vh;font-size:15px}
+  button{font:inherit;color:inherit;cursor:pointer}
+  header{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(11,13,18,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .brand{font-family:var(--font-d);font-weight:700;letter-spacing:.5px}
+  .brand small{display:block;font-family:var(--font-b);font-weight:500;color:var(--muted);font-size:12px;letter-spacing:0}
+  .hr{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chip{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px}
+  .chip.sel{background:var(--ink);color:#0b0d12;border-color:var(--ink)}
+  .btn-corte{background:linear-gradient(135deg,var(--neon),var(--morada));color:#081018;border:0;border-radius:10px;padding:9px 14px;font-weight:800;font-size:14px}
+  .conn{font-size:12.5px;color:var(--muted)} .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#888;margin-right:5px}
+  .dot.on{background:var(--verde)} .dot.off{background:var(--warm)}
+  main{max-width:1240px;margin:0 auto;padding:14px 16px 60px;display:grid;gap:14px}
+  .card{background:linear-gradient(165deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:16px;padding:14px}
+  .card h2{font-family:var(--font-d);font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .card h2 small{font-family:var(--font-b);font-weight:500;color:var(--muted);font-size:12.5px}
+  .banner{padding:10px 14px;border-radius:12px;font-size:14px;background:rgba(255,194,46,.12);border:1px solid rgba(255,194,46,.45);color:var(--yellow)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}
+  .stat{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .l{font-size:12px;color:var(--muted)} .stat .v{font-family:var(--font-d);font-size:26px;font-weight:700}
+  .hidden{display:none!important}
+
+  /* ----- Turnos sin cita ----- */
+  .turnos-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px}
+  .turnos-nums{display:flex;flex-wrap:wrap;align-items:center;gap:18px}
+  .t-pill{display:flex;flex-direction:column;gap:2px}
+  .t-pill .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+  .t-pill .v{font-family:var(--font-d);font-size:26px;font-weight:800;line-height:1.05}
+  .t-pill .v.sig{color:var(--neon)}
+  .t-pill .sub{font-size:12px;color:var(--muted)}
+  .turnos-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .turno-sheet{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(43,228,242,.5);background:rgba(43,228,242,.1);font-size:13.5px;line-height:1.4}
+  .turno-sheet b{font-family:var(--font-d);font-size:16px;color:var(--neon)}
+  .turno-sheet small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+
+  /* ----- Rejilla de casillas ----- */
+  .grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  table.grid{border-collapse:separate;border-spacing:5px;min-width:100%}
+  table.grid th{font-size:12px;color:var(--muted);font-weight:700;padding:4px 2px;white-space:nowrap}
+  table.grid th.now{color:var(--neon)}
+  table.grid td.n{font-size:11px;color:var(--dim);text-align:right;padding-right:2px;width:18px}
+  .cell{position:relative;width:84px;height:50px;border-radius:9px;border:1px dashed rgba(255,255,255,.14);background:rgba(255,255,255,.02);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;user-select:none}
+  .cell .wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:18px;color:rgba(255,255,255,.06);pointer-events:none}
+  .cell.open{border-color:rgba(43,228,242,.45);background:rgba(43,228,242,.05);cursor:pointer}
+  .cell.open:hover{background:rgba(43,228,242,.12)}
+  .cell.next{border-style:solid;border-color:var(--neon);box-shadow:0 0 0 2px rgba(43,228,242,.18) inset}
+  .cell.next .wm{color:rgba(43,228,242,.35)}
+  .cell.lock{opacity:.45}
+  .cell.future{opacity:.25}
+  .cell.done{border-style:solid;cursor:pointer}
+  .cell.done.verde{border-color:rgba(23,232,164,.6);background:rgba(23,232,164,.14)}
+  .cell.done.morada{border-color:rgba(172,130,255,.65);background:rgba(172,130,255,.16)}
+  .cell.done.past{cursor:default;opacity:.85}
+  .cell .p{font-weight:800;font-size:13px}
+  .cell .t{font-weight:700;font-size:12.5px}
+  .cell .ts{font-size:10.5px;color:var(--muted)}
+  .cell .lk{position:absolute;top:2px;right:4px;font-size:9px;opacity:.7}
+
+  /* ----- Panel de marcado ----- */
+  .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+  .sheet{width:min(720px,100%);max-height:90vh;overflow-y:auto;background:#151a26;border:1px solid var(--line);border-radius:18px 18px 0 0;padding:16px 16px 22px;box-shadow:0 -20px 60px rgba(0,0,0,.5)}
+  @media(min-width:760px){.sheet-bg{align-items:center}.sheet{border-radius:18px}}
+  .sheet h3{font-family:var(--font-d);font-size:17px;margin-bottom:4px}
+  .sheet .sub{color:var(--muted);font-size:13px;margin-bottom:12px}
+  .sheet .lbl{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:10px 0 6px}
+  .opts{display:grid;gap:8px}
+  .opts.p4{grid-template-columns:repeat(4,1fr)}
+  .opts.t5{grid-template-columns:repeat(5,1fr)}
+  @media(max-width:520px){.opts.t5{grid-template-columns:repeat(3,1fr)}}
+  .op{border:1.5px solid var(--line);background:rgba(255,255,255,.04);border-radius:12px;padding:12px 6px;text-align:center}
+  .op b{display:block;font-family:var(--font-d);font-size:19px}
+  .op span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+  .op.sel{background:var(--ink);color:#0b0d12;border-color:var(--ink)} .op.sel span{color:#333}
+  .op.verde{border-color:rgba(23,232,164,.55)} .op.morada{border-color:rgba(172,130,255,.6)}
+  .op.verde:active,.op.verde.flash{background:rgba(23,232,164,.35)} .op.morada:active,.op.morada.flash{background:rgba(172,130,255,.4)}
+  .op.last{box-shadow:0 0 0 2px var(--yellow) inset}
+  .sheet .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+  .b{border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:10px;padding:10px 16px;font-weight:700}
+  .b.danger{background:var(--warm);border-color:var(--warm);color:#fff}
+  .b.pri{background:var(--neon);border-color:var(--neon);color:#081018}
+  .hint{font-size:13px;color:var(--warm);min-height:18px;margin-top:8px}
+
+  /* ----- Folios y canceladas ----- */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media(max-width:860px){.two{grid-template-columns:1fr}}
+  .fol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .fbox{border-radius:12px;padding:10px;border:1px solid}
+  .fbox.verde{border-color:rgba(23,232,164,.45);background:rgba(23,232,164,.07)} .fbox.morada{border-color:rgba(172,130,255,.5);background:rgba(172,130,255,.08)}
+  .fbox h4{font-size:13px;margin-bottom:6px}
+  .frow{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}
+  .frow label{font-size:12.5px;color:var(--muted);width:62px}
+  input.in{background:rgba(0,0,0,.35);border:1px solid var(--line);color:#fff;border-radius:8px;padding:8px;font:inherit;font-family:ui-monospace,Menlo,monospace;width:130px}
+  input.in:disabled{opacity:.9;border-color:transparent;background:rgba(0,0,0,.2)}
+  .mini{border:1px solid var(--line);background:rgba(255,255,255,.07);border-radius:8px;padding:7px 10px;font-size:13px;font-weight:700}
+  .mini.ok{border-color:var(--verde);color:var(--verde)} .mini.warn{border-color:var(--warm);color:var(--warm)}
+  .mini.yel{border-color:rgba(255,194,46,.6);color:var(--yellow)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:transparent;padding:9px 14px;font-weight:700}
+  .seg button.sel.verde{background:var(--verde);color:#062016} .seg button.sel.morada{background:var(--morada);color:#160a2e}
+  .list{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+  .tag{display:inline-flex;gap:6px;align-items:center;border-radius:999px;padding:5px 10px;font-size:13px;font-family:ui-monospace,Menlo,monospace;border:1px solid}
+  .tag.verde{border-color:rgba(23,232,164,.6);color:var(--verde)} .tag.morada{border-color:rgba(172,130,255,.65);color:var(--morada)}
+  .tag button{border:0;background:transparent;color:inherit;font-weight:800;opacity:.75}
+  .msg{font-size:13px;color:var(--muted);min-height:18px;margin-top:6px} .msg.bad{color:var(--warm)} .msg.ok{color:var(--verde)}
+
+  /* ----- Oficial ----- */
+  .cnt{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:620px){.cnt{grid-template-columns:1fr}}
+  .cbox{border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;background:rgba(0,0,0,.22)}
+  .cbox.sig{border-color:rgba(43,228,242,.5);background:rgba(43,228,242,.06)}
+  .cbox .l{font-size:13px;color:var(--muted);font-weight:600}
+  .cbox .v{font-family:var(--font-d);font-size:44px;font-weight:800}
+  .cbox.sig .v{color:var(--neon)}
+  .cbox .bb{display:flex;gap:8px;justify-content:center;margin-top:8px}
+  .cbox .plus{background:var(--neon);color:#081018;border:0;border-radius:12px;padding:14px 22px;font-weight:800;font-size:18px}
+  .cbox .minus{border:1px solid var(--line);background:transparent;border-radius:12px;padding:14px 16px;font-weight:800}
+  table.res{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.res td,table.res th{padding:6px;border-bottom:1px solid var(--line);text-align:center}
+  table.res th{color:var(--muted);font-size:12px;font-weight:600} table.res td:first-child,table.res th:first-child{text-align:left}
+
+  /* ----- Reportes 12:00, 15:00 y 18:00 ----- */
+  .aviso{position:sticky;top:var(--aviso-top,64px);z-index:25;border-radius:14px;padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-weight:700}
+  .aviso.pend{background:#3b1422;border:1.5px solid var(--warm);color:#ffd0db;animation:pulso 1.6s ease-in-out infinite}
+  .aviso.ok{background:#0f2e25;border:1px solid var(--verde);color:var(--verde)}
+  @keyframes pulso{0%,100%{box-shadow:0 0 0 0 rgba(255,61,112,.35)}50%{box-shadow:0 0 0 8px rgba(255,61,112,0)}}
+  .rep{display:grid;grid-template-columns:repeat(3,1fr);gap:12px} @media(max-width:960px){.rep{grid-template-columns:1fr}}
+  .rbox{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(0,0,0,.22)}
+  .rbox.activo{border-color:var(--warm)} .rbox.enviado{border-color:rgba(23,232,164,.55)}
+  .rbox h3{font-family:var(--font-d);font-size:16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .rl{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .rl:last-of-type{border-bottom:0} .rl b{font-family:var(--font-d);font-size:20px}
+  .rl input{width:80px;text-align:center}
+  .rbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  #login{max-width:380px;margin:60px auto}
+  #login input{width:100%;margin:6px 0}
+
+  /* ----- Ajustes para celular ----- */
+  @media(max-width:760px){
+    header{position:static;padding:10px 12px;gap:8px}
+    .chip{padding:7px 12px;font-size:13.5px}
+    .btn-corte{padding:8px 12px;font-size:13.5px}
+    main{padding:12px 10px 60px;gap:12px}
+    .card{padding:12px}
+    .aviso{top:8px;padding:10px 12px;font-size:13.5px}
+  }
+  @media(max-width:640px){
+    .fol{grid-template-columns:1fr}
+    .frow input.in{flex:1;min-width:110px;width:auto}
+    .turnos-bar{gap:10px}
+    .turnos-nums{gap:14px}
+    .t-pill .v{font-size:24px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Captura · Licencias<small id="fechaTxt"></small></div>
+  <div class="hr">
+    <button class="chip" data-role="V1">Ventanilla 1</button>
+    <button class="chip" data-role="V2">Ventanilla 2</button>
+    <button class="chip" data-role="OF">Oficial</button>
+    <button class="btn-corte" id="bCorte">Mostrar Corte Final</button>
+    <span class="conn"><span class="dot" id="dot"></span><span id="connTxt">conectando…</span></span>
+    <span class="conn" id="clock"></span>
+    <button class="mini hidden" id="bSalir">Salir</button>
+  </div>
+</header>
+
+<section id="login" class="card hidden">
+  <h2>Entrar</h2>
+  <input class="in" id="email" type="email" placeholder="Correo" autocomplete="username">
+  <input class="in" id="pass" type="password" placeholder="Contraseña" autocomplete="current-password">
+  <div class="msg bad" id="loginErr"></div>
+  <button class="b pri" id="bLogin" style="width:100%;margin-top:6px">Entrar</button>
+</section>
+
+<main id="app" class="hidden">
+  <div class="banner hidden" id="demo">Modo demostración: los datos se guardan solo en este navegador. Pega tu configuración de Firebase en <b>config.js</b> para usarlo entre los tres.</div>
+  <div class="aviso hidden" id="aviso"></div>
+  <div class="card" id="pick"><h2>¿Dónde estás hoy?</h2><div class="msg">Elige arriba tu lugar: Ventanilla 1, Ventanilla 2 u Oficial. El equipo lo recuerda.</div></div>
+
+  <!-- ================= VENTANILLA ================= -->
+  <section id="vVent" class="hidden" style="display:grid;gap:14px">
+    <div class="stats">
+      <div class="stat"><div class="l">Mis licencias hoy</div><div class="v" id="sMias">0</div></div>
+      <div class="stat"><div class="l">Mis licencias esta hora</div><div class="v" id="sHora">0</div></div>
+      <div class="stat"><div class="l">Total del módulo</div><div class="v" id="sTotal">0</div></div>
+      <div class="stat"><div class="l">Micas canceladas</div><div class="v" id="sCanc">0</div></div>
+    </div>
+
+    <div class="card turnos-bar">
+      <div class="turnos-nums">
+        <div class="t-pill"><span class="l">Turno sin cita actual</span><span class="v" id="tVentActual">—</span><span class="sub" id="tVentMeta">Aún sin turnos</span></div>
+        <div class="t-pill"><span class="l">Siguiente turno</span><span class="v sig" id="tVentSig">#1</span><span class="sub" id="tVentSub">0 atendidos · 0 saltados</span></div>
+      </div>
+      <div class="turnos-btns">
+        <button class="mini yel" id="bSaltarVent" data-saltar>Saltar turno #1</button>
+        <button class="mini hidden" id="bDeshSaltarVent" data-desh-saltar>Deshacer salto</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span id="gTitle">Mis licencias por hora</span><small>Toca la casilla marcada en azul cuando la persona pase a foto.</small></h2>
+      <div class="grid-wrap" id="gWrap"><table class="grid" id="grid"></table></div>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <h2>Folios iniciales <small>Al aceptar, el folio queda bloqueado</small></h2>
+        <div class="fol">
+          <div class="fbox verde"><h4>Micas verdes</h4>
+            <div class="frow"><label>Serie 1</label><input class="in" data-fol="verde1" inputmode="numeric"><button class="mini ok" data-ok="verde1">Aceptar</button></div>
+            <div class="frow"><label>Serie 2</label><input class="in" data-fol="verde2" inputmode="numeric"><button class="mini ok" data-ok="verde2">Aceptar</button></div>
+          </div>
+          <div class="fbox morada"><h4>Micas moradas (lilas)</h4>
+            <div class="frow"><label>Serie 1</label><input class="in" data-fol="morada1" inputmode="numeric"><button class="mini ok" data-ok="morada1">Aceptar</button></div>
+            <div class="frow"><label>Serie 2</label><input class="in" data-fol="morada2" inputmode="numeric"><button class="mini ok" data-ok="morada2">Aceptar</button></div>
+          </div>
+        </div>
+        <div class="msg" id="folMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>Mica cancelada <small>Se anota el folio en el momento</small></h2>
+        <div class="frow">
+          <div class="seg"><button data-color="verde" class="verde">Verde</button><button data-color="morada" class="morada">Morada</button></div>
+          <input class="in" id="cFolio" inputmode="numeric" placeholder="Folio">
+          <button class="mini warn" id="bCanc">Registrar</button>
+        </div>
+        <div class="msg" id="cMsg"></div>
+        <div class="list" id="cList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OFICIAL ================= -->
+  <section id="vOfi" class="hidden" style="display:grid;gap:14px">
+    <div class="card">
+      <h2>Turnos sin cita en tiempo real <small>Se actualiza solo con lo que registran las ventanillas (HS / MS)</small></h2>
+      <div class="cnt">
+        <div class="cbox"><div class="l">Turno actual (último)</div><div class="v" id="tOfiActual">—</div><div class="msg" id="tOfiMeta">Aún no inicia</div></div>
+        <div class="cbox sig"><div class="l">Siguiente turno</div><div class="v" id="tOfiSig">#1</div><div class="msg" id="tOfiSub">0 atendidos sin cita · 0 saltados</div></div>
+      </div>
+      <div class="turnos-btns" style="margin-top:12px;justify-content:flex-end">
+        <button class="mini yel" id="bSaltarOfi" data-saltar>Saltar turno #1</button>
+        <button class="mini hidden" id="bDeshSaltarOfi" data-desh-saltar>Deshacer salto</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Citas registradas del día <small>Captúrelas en la mañana</small></h2>
+      <div class="frow"><label style="width:auto">SEMOVI</label><input class="in" id="regSemovi" inputmode="numeric" style="width:90px">
+        <label style="width:auto;margin-left:14px">Finanzas</label><input class="in" id="regSaf" inputmode="numeric" style="width:90px"></div>
+    </div>
+    <div class="card">
+      <h2>Citas que llegaron <small>Un toque por cada persona con cita</small></h2>
+      <div class="cnt">
+        <div class="cbox"><div class="l">Cita SEMOVI</div><div class="v" id="nSemovi">0</div><div class="msg" id="pSemovi"></div>
+          <div class="bb"><button class="minus" data-menos="semovi">− 1</button><button class="plus" data-mas="semovi">+ Llegó</button></div></div>
+        <div class="cbox"><div class="l">Cita Finanzas</div><div class="v" id="nSaf">0</div><div class="msg" id="pSaf"></div>
+          <div class="bb"><button class="minus" data-menos="saf">− 1</button><button class="plus" data-mas="saf">+ Llegó</button></div></div>
+      </div>
+      <div class="msg" id="cruce"></div>
+    </div>
+  </section>
+
+  <!-- ================= REPORTES 12:00, 15:00 Y 18:00 (todos) ================= -->
+  <section class="card hidden" id="vRep">
+    <h2>Reportes a superiores <small>Aviso 10 minutos antes (12:00, 15:00 y 18:00) · cifras acumuladas del día</small></h2>
+    <div class="rep" id="repBox"></div>
+    <div class="msg">Nueva permanente = NP + Rep. NP · Digitales a físicas = Digital NP (DNP) · Otras = todas las micas verdes (incluye Digital 3 años).</div>
+  </section>
+
+  <!-- ================= RESUMEN (todos) ================= -->
+  <section class="card hidden" id="vRes">
+    <h2>Resumen del día <small>Así se llenará el Corte Final</small></h2>
+    <div class="two">
+      <div class="grid-wrap"><table class="res" id="resHoras"></table></div>
+      <div class="grid-wrap"><table class="res" id="resTram"></table></div>
+    </div>
+  </section>
+</main>
+
+<!-- Panel para marcar -->
+<div class="sheet-bg hidden" id="sheetBg">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script>
+/* ============================================================
+   CATÁLOGO DE TRÁMITES (orden = más frecuentes primero)
+   campo = id del campo en Final.html (Módulo 1)
+   ============================================================ */
+const TRAMITES = [
+  { c: "NP",      n: "Nueva permanente",     mica: "morada", campo: "m1-nueva-perm" },
+  { c: "NA",      n: "Nueva A",              mica: "verde",  campo: "m1-nuevas" },
+  { c: "RA",      n: "Renovación A",         mica: "verde",  campo: "m1-renovaciones" },
+  { c: "RepA",    n: "Reposición 3 años",    mica: "verde",  campo: "m1-rep-3" },
+  { c: "D3",      n: "Digital 3 años",       mica: "verde",  campo: "m1-digitales-verde" },
+  { c: "DNP",     n: "Digital NP",           mica: "morada", campo: "m1-digitales-lila" },
+  { c: "P",       n: "Permiso",              mica: "verde",  campo: "m1-permisos" },
+  { c: "RepP",    n: "Rep. permiso",         mica: "verde",  campo: "m1-rep-permiso" },
+  { c: "RepPerm", n: "Rep. permanente",      mica: "verde",  campo: "m1-rep-perm" },
+  { c: "RepNP",   n: "Rep. nueva perm.",     mica: "morada", campo: "m1-rep-nueva-perm" }
+];
+const TR = Object.fromEntries(TRAMITES.map(t => [t.c, t]));
+const PERSONAS = [["HC", "Hombre con cita"], ["HS", "Hombre sin cita"], ["MC", "Mujer con cita"], ["MS", "Mujer sin cita"]];
+const HORAS = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; // mismas horas que el Módulo 1
+const CASILLAS = 12;
+const ROLES = { V1: "Ventanilla 1", V2: "Ventanilla 2", OF: "Oficial" };
+
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const num = v => { const n = parseInt(String(v ?? "").replace(/\D/g, ""), 10); return Number.isFinite(n) ? n : 0; };
+const hhmm = ms => { const d = new Date(ms); return `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`; };
+// Hora actual (para pruebas se puede forzar con ?prueba_hora=17:52)
+const forced = new URLSearchParams(location.search).get("prueba_hora");
+const now = () => { const d = new Date(); if (forced) { const [h, m] = forced.split(":").map(Number); d.setHours(h, m || 0, 0, 0); } return d; };
+const curHour = () => now().getHours();
+
+const FECHA = Corte.dateKey();
+let store, DAY = {}, role = Corte.lsGet("corte-role", null), cColor = null;
+
+function syncAvisoTop() {
+  const h = $("header");
+  const sticky = h && getComputedStyle(h).position === "sticky";
+  document.documentElement.style.setProperty("--aviso-top", sticky ? `${h.offsetHeight + 8}px` : "8px");
+}
+window.addEventListener("resize", syncAvisoTop);
+
+/* ---------- conteos del día ---------- */
+function marks(day) {
+  const out = [];
+  for (const v of ["V1", "V2"]) {
+    const g = (day.v || {})[v] || {};
+    for (const h of Object.keys(g)) for (const s of Object.keys(g[h] || {})) { const m = g[h][s]; if (m && m.p && m.tr) out.push({ v, h: +h, s: +s, ...m }); }
+  }
+  return out;
+}
+
+/* ---------- turnos sin cita (HS / MS + saltados) ---------- */
+function infoTurnos(all) {
+  const sinCita = all.filter(m => m.p === "HS" || m.p === "MS");
+  const saltados = Object.entries((DAY.turnos || {}).saltados || {})
+    .map(([id, s]) => ({ id, ...s }))
+    .sort((a, b) => (b.t || 0) - (a.t || 0) || (a.id < b.id ? 1 : -1));
+  const actual = sinCita.length + saltados.length;
+  const siguiente = actual + 1;
+
+  const eventos = [
+    ...sinCita.map(m => ({ tipo: "atendido", por: m.v, t: m.t || 0, p: m.p })),
+    ...saltados.map(s => ({ tipo: "saltado", por: s.por, t: s.t || 0 }))
+  ].sort((a, b) => b.t - a.t);
+  const ultimo = eventos[0] || null;
+
+  let meta = "Aún no inicia";
+  if (ultimo) {
+    const quien = ROLES[ultimo.por] || ultimo.por || "";
+    const hora = ultimo.t ? ` · ${hhmm(ultimo.t)}` : "";
+    meta = ultimo.tipo === "saltado" ? `Saltado por ${quien}${hora}` : `${quien}${hora}`;
+  }
+  const sub = `${sinCita.length} ${sinCita.length === 1 ? "atendido" : "atendidos"} · ${saltados.length} ${saltados.length === 1 ? "saltado" : "saltados"}`;
+  return { atendidos: sinCita.length, saltados, actual, siguiente, ultimo, meta, sub };
+}
+
+function renderTurnos(all) {
+  const t = infoTurnos(all);
+  const actTxt = t.actual ? `#${t.actual}` : "—";
+  const sigTxt = `#${t.siguiente}`;
+
+  // Ventanilla
+  $("#tVentActual").textContent = actTxt;
+  $("#tVentMeta").textContent = t.meta;
+  $("#tVentSig").textContent = sigTxt;
+  $("#tVentSub").textContent = t.sub;
+
+  // Oficial
+  $("#tOfiActual").textContent = actTxt;
+  $("#tOfiMeta").textContent = t.meta;
+  $("#tOfiSig").textContent = sigTxt;
+  $("#tOfiSub").textContent = `${t.atendidos} ${t.atendidos === 1 ? "atendido" : "atendidos"} sin cita · ${t.saltados.length} ${t.saltados.length === 1 ? "saltado" : "saltados"}`;
+
+  // Botones Saltar / Deshacer salto (sin interrumpir confirmación de doble toque)
+  $$("[data-saltar]").forEach(b => {
+    if (b.dataset.c !== "1") b.textContent = `Saltar turno #${t.siguiente}`;
+  });
+  $$("[data-desh-saltar]").forEach(b => {
+    b.classList.toggle("hidden", t.saltados.length === 0);
+    if (b.dataset.c !== "1") b.textContent = "Deshacer salto";
+  });
+}
+
+/* ---------- render ---------- */
+function render() {
+  $("#pick").classList.toggle("hidden", !!role);
+  $("#vVent").classList.toggle("hidden", !(role === "V1" || role === "V2"));
+  $("#vOfi").classList.toggle("hidden", role !== "OF");
+  $("#vRes").classList.toggle("hidden", !role);
+  $("#vRep").classList.toggle("hidden", !role);
+  $$(".chip").forEach(c => c.classList.toggle("sel", c.dataset.role === role));
+  const all = marks(DAY);
+  const canc = Object.entries(DAY.canc || {});
+  if (role) renderTurnos(all);
+  if (role === "V1" || role === "V2") renderVent(all, canc);
+  if (role === "OF") renderOfi(all);
+  if (role) renderRes(all, canc);
+  if (role && !document.querySelector("#repBox input:focus")) renderRep(all);
+  syncAvisoTop();
+}
+
+function renderVent(all, canc) {
+  const ch = curHour();
+  const mine = all.filter(m => m.v === role);
+  $("#sMias").textContent = mine.length;
+  $("#sHora").textContent = mine.filter(m => m.h === ch).length;
+  $("#sTotal").textContent = all.length;
+  $("#sCanc").textContent = canc.length;
+  $("#gTitle").textContent = `Licencias de ${ROLES[role]}`;
+
+  const g = ((DAY.v || {})[role]) || {};
+  let nextDone = false;
+  let html = `<tr><th></th>${HORAS.map(h => `<th class="${h === ch ? "now" : ""}">${h}:00</th>`).join("")}</tr>`;
+  for (let s = 1; s <= CASILLAS; s++) {
+    html += `<tr><td class="n">${s}</td>`;
+    for (const h of HORAS) {
+      const m = (g[h] || {})[s];
+      if (m && m.p) {
+        const t = TR[m.tr] || {};
+        const past = h < ch;
+        html += `<td><div class="cell done ${t.mica || ""} ${past ? "past" : ""}" data-h="${h}" data-s="${s}">
+          ${past ? '<span class="lk">🔒</span>' : ""}<span class="p">${m.p}</span><span class="t">${m.tr}</span><span class="ts">${hhmm(m.t)}</span></div></td>`;
+      } else if (h === ch) {
+        // primera casilla libre de la hora actual = siguiente
+        let first = true; for (let k = 1; k < s; k++) if (!(g[h] || {})[k]) { first = false; break; }
+        const nx = first && !nextDone; if (nx) nextDone = true;
+        html += `<td><div class="cell open ${nx ? "next" : ""}" data-h="${h}" data-s="${s}"><span class="wm">${s}</span></div></td>`;
+      } else {
+        html += `<td><div class="cell ${h < ch ? "lock" : "future"}"><span class="wm">${s}</span></div></td>`;
+      }
+    }
+    html += `</tr>`;
+  }
+  $("#grid").innerHTML = html;
+
+  // Folios iniciales
+  const f = DAY.folios || {};
+  $$("[data-fol]").forEach(i => {
+    const k = i.dataset.fol, v = f[k];
+    const btn = $(`[data-ok="${k}"]`);
+    if (v && v.v) { i.value = v.v; i.disabled = true; btn.textContent = "🔒 Corregir"; btn.className = "mini"; btn.title = `Aceptado por ${ROLES[v.por] || ""} a las ${hhmm(v.t)}`; }
+    else { if (i.disabled) i.value = ""; i.disabled = false; if (btn.dataset.c !== "1") { btn.textContent = "Aceptar"; btn.className = "mini ok"; } }
+  });
+
+  // Canceladas
+  $$(".seg button").forEach(b => b.classList.toggle("sel", b.dataset.color === cColor));
+  $("#cList").innerHTML = canc.sort((a, b) => a[0] < b[0] ? -1 : 1).map(([id, c]) =>
+    `<span class="tag ${c.color}">${c.folio}<button title="Borrar" data-delc="${id}">✕</button></span>`).join("") || `<span class="msg">Sin micas canceladas hoy.</span>`;
+}
+
+function renderOfi(all) {
+  const o = DAY.ofi || {}, lleg = Object.values(o.llegadas || {});
+  const nS = lleg.filter(x => x.f === "semovi").length, nF = lleg.filter(x => x.f === "saf").length;
+  $("#nSemovi").textContent = nS; $("#nSaf").textContent = nF;
+  $("#pSemovi").textContent = o.regSemovi ? `de ${o.regSemovi} registradas` : "";
+  $("#pSaf").textContent = o.regSaf ? `de ${o.regSaf} registradas` : "";
+  ["regSemovi", "regSaf"].forEach(k => { const i = $("#" + k); if (document.activeElement !== i) i.value = o[k] || ""; });
+  const conCita = all.filter(m => m.p === "HC" || m.p === "MC").length;
+  $("#cruce").textContent = `Las ventanillas han marcado ${conCita} licencias con cita; aquí van ${nS + nF} citas que llegaron.` + (conCita !== nS + nF ? " (La diferencia puede ser gente en espera o una marca por corregir.)" : " ✔");
+}
+
+function renderRes(all, canc) {
+  const rows = HORAS.map(h => {
+    const m = all.filter(x => x.h === h);
+    const H = m.filter(x => x.p[0] === "H").length, M = m.filter(x => x.p[0] === "M").length;
+    return `<tr><td>${h}:00</td><td>${H}</td><td>${M}</td><td>${m.filter(x => x.p[1] === "C").length}</td><td>${m.filter(x => x.p[1] === "S").length}</td><td><b>${H + M}</b></td></tr>`;
+  }).join("");
+  $("#resHoras").innerHTML = `<tr><th>Hora</th><th>H</th><th>M</th><th>Con cita</th><th>Sin cita</th><th>Total</th></tr>${rows}
+    <tr><th>Total</th><th>${all.filter(x => x.p[0] === "H").length}</th><th>${all.filter(x => x.p[0] === "M").length}</th><th>${all.filter(x => x.p[1] === "C").length}</th><th>${all.filter(x => x.p[1] === "S").length}</th><th>${all.length}</th></tr>`;
+  const cv = canc.filter(([, c]) => c.color === "verde").length, cm = canc.length - cv;
+  $("#resTram").innerHTML = `<tr><th>Trámite</th><th>Mica</th><th>Cantidad</th></tr>` +
+    TRAMITES.map(t => `<tr><td>${t.n}</td><td>${t.mica === "verde" ? "Verde" : "Morada"}</td><td>${all.filter(x => x.tr === t.c).length}</td></tr>`).join("") +
+    `<tr><td>Canceladas</td><td>Verde / Morada</td><td>${cv} / ${cm}</td></tr>`;
+}
+
+/* ---------- reportes de las 12:00, 15:00 y 18:00 ---------- */
+const REPORTES = [
+  { k: "12", h: 12, label: "12:00 pm" },
+  { k: "15", h: 15, label: "3:00 pm" },
+  { k: "18", h: 18, label: "6:00 pm" }
+];
+const AVISO_MIN = 10; // minutos antes
+function cifras(all) {
+  const c = tr => all.filter(x => tr.includes(x.tr)).length;
+  return {
+    np: c(["NP", "RepNP"]),
+    dig: c(["DNP"]),
+    otras: c(["NA", "RA", "RepA", "D3", "P", "RepP", "RepPerm"])
+  };
+}
+function textoReporte(r, d) {
+  return `Reporte ${r.label} · Tesorería Express Félix Cuevas\n` +
+    `Personas en fila: ${d.fila ?? "—"}\n` +
+    `Operadores en turno: ${d.oper ?? "—"}\n` +
+    `Licencias emitidas Nueva Permanente: ${d.np}\n` +
+    `Impresiones digitales a físicas: ${d.dig}\n` +
+    `Otras licencias emitidas: ${d.otras}`;
+}
+function estadoReporte(r) {
+  const n = now(), m = n.getHours() * 60 + n.getMinutes(), t = r.h * 60;
+  const env = ((DAY.rep || {})[r.k] || {}).enviado;
+  if (env) return "enviado";
+  if (m >= t - AVISO_MIN && m < t + 60) return "activo";   // de 10 min antes hasta 1 h después
+  return m < t - AVISO_MIN ? "pronto" : "vencido";
+}
+let sonado = Corte.lsGet(`corte-sonado-${FECHA}`, {});
+function beep() {
+  try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, .35, .7].forEach(d => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.18, a.currentTime + d); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + d + .3); o.start(a.currentTime + d); o.stop(a.currentTime + d + .3); }); } catch {}
+}
+function renderRep(all) {
+  const live = cifras(all);
+  const n = now(), m = n.getHours() * 60 + n.getMinutes();
+  $("#repBox").innerHTML = REPORTES.map(r => {
+    const d = (DAY.rep || {})[r.k] || {}, est = estadoReporte(r);
+    const vals = d.enviado ? d.enviado.cifras : { ...live, fila: d.fila, oper: d.oper ?? 2 };
+    return `<div class="rbox ${est === "activo" ? "activo" : est === "enviado" ? "enviado" : ""}">
+      <h3>Reporte ${r.label}<small class="msg" style="margin:0">${est === "enviado" ? `✔ Enviado ${hhmm(d.enviado.t)} por ${ROLES[d.enviado.por] || ""}` : est === "activo" ? "⏰ Ya toca enviarlo" : est === "pronto" ? `Aviso a las ${r.h - 1}:${60 - AVISO_MIN}` : "Sin enviar"}</small></h3>
+      <div class="rl"><span>Personas en fila</span>${d.enviado ? `<b>${vals.fila ?? "—"}</b>` : `<input class="in" inputmode="numeric" data-rk="${r.k}" data-rf="fila" value="${d.fila ?? ""}" placeholder="?">`}</div>
+      <div class="rl"><span>Operadores en turno</span>${d.enviado ? `<b>${vals.oper ?? "—"}</b>` : `<input class="in" inputmode="numeric" data-rk="${r.k}" data-rf="oper" value="${d.oper ?? 2}">`}</div>
+      <div class="rl"><span>Licencias Nueva Permanente</span><b>${vals.np}</b></div>
+      <div class="rl"><span>Impresiones digitales a físicas (DNP)</span><b>${vals.dig}</b></div>
+      <div class="rl"><span>Otras licencias emitidas</span><b>${vals.otras}</b></div>
+      <div class="rbtns">
+        <button class="mini" data-copiar="${r.k}">Copiar mensaje</button>
+        ${d.enviado ? `<button class="mini" data-reabrir="${r.k}">Corregir</button>` : `<button class="mini ok" data-enviar="${r.k}">Marcar como enviado</button>`}
+      </div></div>`;
+  }).join("");
+
+  // Aviso arriba (para todos los roles)
+  const act = REPORTES.find(r => estadoReporte(r) === "activo");
+  const av = $("#aviso");
+  if (act) {
+    const faltan = act.h * 60 - m;
+    av.className = "aviso pend";
+    av.innerHTML = `<span>⏰ Reporte de las ${act.label}: ${faltan > 0 ? `faltan ${faltan} min` : "ya es la hora"}. Personas en fila, operadores, NP, digitales NP y otras.</span><button class="mini" data-ir>Ver reporte</button>`;
+    if (!sonado[act.k]) { sonado[act.k] = 1; Corte.lsSet(`corte-sonado-${FECHA}`, sonado); beep(); }
+  } else av.className = "aviso hidden";
+}
+document.addEventListener("change", e => {
+  const i = e.target; if (!i.dataset || !i.dataset.rk) return;
+  store.set(FECHA, `rep/${i.dataset.rk}/${i.dataset.rf}`, i.value === "" ? null : num(i.value));
+});
+document.addEventListener("click", async e => {
+  // Saltar / deshacer salto de turno sin cita
+  const bs = e.target.closest("[data-saltar],[data-desh-saltar]");
+  if (bs) {
+    const t = infoTurnos(marks(DAY));
+    if (bs.dataset.saltar !== undefined) {
+      if (bs.dataset.c !== "1") {
+        bs.dataset.c = "1";
+        bs.textContent = `¿Saltar #${t.siguiente}? Toca otra vez`;
+        setTimeout(() => { bs.dataset.c = ""; render(); }, 3500);
+        return;
+      }
+      bs.dataset.c = "";
+      await store.push(FECHA, "turnos/saltados", { por: role, t: Date.now() });
+      return;
+    }
+    if (bs.dataset.deshSaltar !== undefined) {
+      if (!t.saltados.length) return;
+      if (bs.dataset.c !== "1") {
+        bs.dataset.c = "1";
+        bs.textContent = "¿Deshacer último salto?";
+        setTimeout(() => { bs.dataset.c = ""; render(); }, 3500);
+        return;
+      }
+      bs.dataset.c = "";
+      await store.remove(FECHA, `turnos/saltados/${t.saltados[0].id}`);
+      return;
+    }
+  }
+
+  // Reportes
+  const b = e.target.closest("[data-copiar],[data-enviar],[data-reabrir],[data-ir]"); if (!b) return;
+  if (b.dataset.ir !== undefined) { $("#vRep").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+  const k = b.dataset.copiar || b.dataset.enviar || b.dataset.reabrir, r = REPORTES.find(x => x.k === k);
+  const d = (DAY.rep || {})[k] || {};
+  const vals = d.enviado ? d.enviado.cifras : { ...cifras(marks(DAY)), fila: d.fila, oper: d.oper ?? 2 };
+  if (b.dataset.copiar) {
+    const txt = textoReporte(r, vals); let ok = false;
+    try { await navigator.clipboard.writeText(txt); ok = true; } catch { try { const t = document.createElement("textarea"); t.value = txt; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); } catch {} }
+    b.textContent = ok ? "¡Copiado!" : "No se pudo copiar"; setTimeout(() => render(), 1500);
+  } else if (b.dataset.enviar) {
+    if (vals.fila == null) { b.textContent = "Falta personas en fila"; setTimeout(() => render(), 1800); return; }
+    await store.set(FECHA, `rep/${k}/enviado`, { t: Date.now(), por: role, cifras: vals });
+  } else if (b.dataset.reabrir) {
+    if (b.dataset.c !== "1") { b.dataset.c = "1"; b.textContent = "¿Corregir? Toca otra vez"; setTimeout(() => render(), 3500); return; }
+    await store.set(FECHA, `rep/${k}/enviado`, null);
+  }
+});
+
+/* ---------- panel para marcar ---------- */
+let pend = null; // {h, s, p}
+function updateSheetTurno() {
+  const box = $("#sTurno");
+  if (!box || !pend || pend.remove) return;
+  if (pend.p === "HS" || pend.p === "MS") {
+    const t = infoTurnos(marks(DAY));
+    const ult = t.actual ? `Último en sistema: #${t.actual} (${t.meta})` : "Aún no hay turnos sin cita registrados";
+    box.innerHTML = `Turno sin cita · Registrando: <b>#${t.siguiente}</b> · Siguiente: <b>#${t.siguiente + 1}</b><small>${ult}</small>`;
+    box.classList.remove("hidden");
+  } else {
+    box.classList.add("hidden");
+  }
+}
+function openSheet(h, s) {
+  pend = { h, s, p: null };
+  const last = Corte.lsGet(`corte-last-${role}`, null);
+  $("#sheet").innerHTML = `
+    <h3>Casilla ${s} · ${h}:00</h3><div class="sub">Elige la persona y después el trámite. Se guarda al tocar el trámite.</div>
+    <div class="lbl">Persona</div>
+    <div class="opts p4">${PERSONAS.map(([c, n]) => `<button class="op" data-p="${c}"><b>${c}</b><span>${n}</span></button>`).join("")}</div>
+    <div class="turno-sheet hidden" id="sTurno"></div>
+    <div class="lbl">Trámite</div>
+    <div class="opts t5">${TRAMITES.map(t => `<button class="op ${t.mica} ${last === t.c ? "last" : ""}" data-tr="${t.c}"><b>${t.c}</b><span>${t.n}</span></button>`).join("")}</div>
+    <div class="hint" id="sHint"></div>
+    <div class="row"><button class="b" data-close>Cancelar</button></div>`;
+  $("#sheetBg").classList.remove("hidden");
+}
+function confirmRemove(h, s, m) {
+  pend = { h, s, remove: true };
+  $("#sheet").innerHTML = `<h3>¿Quitar esta marca?</h3>
+    <div class="sub">Casilla ${s} · ${h}:00 — ${m.p} · ${(TR[m.tr] || {}).n || m.tr} · marcada a las ${hhmm(m.t)}</div>
+    <div class="row"><button class="b" data-close>No, dejarla</button><button class="b danger" data-quitar>Sí, quitar</button></div>`;
+  $("#sheetBg").classList.remove("hidden");
+}
+function closeSheet() { $("#sheetBg").classList.add("hidden"); pend = null; }
+
+$("#sheetBg").addEventListener("click", async e => {
+  if (e.target === $("#sheetBg") || e.target.closest("[data-close]")) return closeSheet();
+  const pb = e.target.closest("[data-p]");
+  if (pb) {
+    pend.p = pb.dataset.p;
+    $$("#sheet [data-p]").forEach(b => b.classList.toggle("sel", b === pb));
+    $("#sHint").textContent = "";
+    updateSheetTurno();
+    return;
+  }
+  const tb = e.target.closest("[data-tr]");
+  if (tb) {
+    if (!pend.p) { $("#sHint").textContent = "Primero elige HC, HS, MC o MS."; return; }
+    if (pend.h !== curHour()) { $("#sHint").textContent = "La hora ya cambió; la casilla quedó bloqueada."; return; }
+    tb.classList.add("flash");
+    const { h, s, p } = pend;
+    Corte.lsSet(`corte-last-${role}`, tb.dataset.tr);
+    closeSheet();
+    await store.set(FECHA, `v/${role}/${h}/${s}`, { p, tr: tb.dataset.tr, t: Date.now() });
+    return;
+  }
+  if (e.target.closest("[data-quitar]")) {
+    const { h, s } = pend; closeSheet();
+    if (h !== curHour()) return; // ya pasó la hora
+    await store.remove(FECHA, `v/${role}/${h}/${s}`);
+  }
+});
+
+$("#grid").addEventListener("click", e => {
+  const c = e.target.closest(".cell"); if (!c || !c.dataset.h) return;
+  const h = +c.dataset.h, s = +c.dataset.s;
+  if (h !== curHour()) return; // horas pasadas bloqueadas, futuras sin abrir
+  const m = (((DAY.v || {})[role] || {})[h] || {})[s];
+  if (m && m.p) confirmRemove(h, s, m); else openSheet(h, s);
+});
+
+/* ---------- folios iniciales ---------- */
+$$("[data-ok]").forEach(b => b.onclick = async () => {
+  const k = b.dataset.ok, i = $(`[data-fol="${k}"]`), cur = (DAY.folios || {})[k];
+  if (cur && cur.v) { // corregir: doble toque
+    if (b.dataset.c !== "1") { b.dataset.c = "1"; b.textContent = "¿Corregir? Toca otra vez"; setTimeout(() => { b.dataset.c = ""; render(); }, 4000); return; }
+    b.dataset.c = ""; await store.set(FECHA, `folios/${k}`, null); i.focus(); return;
+  }
+  const v = num(i.value);
+  if (!v) { msg("#folMsg", "Escribe el folio antes de aceptar.", "bad"); return; }
+  await store.set(FECHA, `folios/${k}`, { v: String(v), por: role, t: Date.now() });
+  msg("#folMsg", `Folio ${v} aceptado y bloqueado.`, "ok");
+});
+
+/* ---------- micas canceladas ---------- */
+$$(".seg button").forEach(b => b.onclick = () => { cColor = b.dataset.color; render(); });
+$("#bCanc").onclick = async () => {
+  const folio = num($("#cFolio").value);
+  if (!cColor) return msg("#cMsg", "Elige si la mica es verde o morada.", "bad");
+  if (!folio) return msg("#cMsg", "Escribe el folio de la mica cancelada.", "bad");
+  const canc = Object.values(DAY.canc || {});
+  if (canc.some(c => c.color === cColor && num(c.folio) === folio)) return msg("#cMsg", `El folio ${folio} ya está registrado.`, "bad");
+  const f = DAY.folios || {};
+  const inis = [1, 2].map(n => num((f[cColor + n] || {}).v)).filter(Boolean);
+  const aviso = inis.length && !inis.some(i => folio >= i) ? " Ojo: es menor que el folio inicial de esa mica." : "";
+  await store.push(FECHA, "canc", { color: cColor, folio: String(folio), por: role, t: Date.now() });
+  $("#cFolio").value = "";
+  msg("#cMsg", `Cancelada registrada: ${cColor} ${folio}.${aviso}`, aviso ? "bad" : "ok");
+};
+$("#cList").addEventListener("click", async e => {
+  const b = e.target.closest("[data-delc]"); if (!b) return;
+  if (b.dataset.c !== "1") { b.dataset.c = "1"; b.textContent = "¿Borrar?"; setTimeout(() => render(), 3500); return; }
+  await store.remove(FECHA, `canc/${b.dataset.delc}`);
+});
+
+/* ---------- oficial ---------- */
+["regSemovi", "regSaf"].forEach(k => $("#" + k).onchange = e => store.set(FECHA, `ofi/${k}`, num(e.target.value) || null));
+$$("[data-mas]").forEach(b => b.onclick = () => store.push(FECHA, "ofi/llegadas", { f: b.dataset.mas, t: Date.now() }));
+$$("[data-menos]").forEach(b => b.onclick = async () => {
+  const ll = Object.entries((DAY.ofi || {}).llegadas || {}).filter(([, x]) => x.f === b.dataset.menos).sort((a, c) => a[0] < c[0] ? 1 : -1);
+  if (ll.length) await store.remove(FECHA, `ofi/llegadas/${ll[0][0]}`);
+});
+
+/* ---------- general ---------- */
+function msg(sel, t, cls = "") { const m = $(sel); m.textContent = t; m.className = "msg " + cls; clearTimeout(m._t); m._t = setTimeout(() => { m.textContent = ""; m.className = "msg"; }, 6000); }
+$$(".chip").forEach(c => c.onclick = () => { role = c.dataset.role; Corte.lsSet("corte-role", role); render(); scrollToNow(); });
+$("#bCorte").onclick = () => window.open(`Final.html?fecha=${FECHA}`, "_blank");
+function scrollToNow() {
+  const th = $("#grid th.now"); const w = $("#gWrap");
+  if (th && w) w.scrollLeft = Math.max(0, th.offsetLeft - 40);
+}
+function tick() {
+  $("#clock").textContent = now().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+  if (Corte.dateKey() !== FECHA) { location.reload(); return; }
+  if ($("#sheetBg").classList.contains("hidden")) render();
+}
+
+(async () => {
+  $("#fechaTxt").textContent = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  syncAvisoTop();
+  store = await Corte.store();
+  if (store.demo) $("#demo").classList.remove("hidden");
+  store.onConn(on => { $("#dot").className = "dot " + (on ? "on" : "off"); $("#connTxt").textContent = on ? (store.demo ? "demo" : "en línea") : "sin conexión (se sube al volver)"; });
+  let started = false;
+  $("#bLogin").onclick = async () => { $("#loginErr").textContent = ""; try { await store.login($("#email").value.trim(), $("#pass").value); } catch { $("#loginErr").textContent = "No se pudo entrar: revisa correo y contraseña."; } };
+  $("#pass").addEventListener("keydown", e => { if (e.key === "Enter") $("#bLogin").click(); });
+  $("#bSalir").onclick = () => store.logout();
+  await store.init(u => {
+    $("#login").classList.toggle("hidden", !!u);
+    $("#app").classList.toggle("hidden", !u);
+    $("#bSalir").classList.toggle("hidden", !u || store.demo);
+    syncAvisoTop();
+    if (u && !started) {
+      started = true;
+      store.watchDay(FECHA, d => {
+        DAY = d || {};
+        if ($("#sheetBg").classList.contains("hidden")) render();
+        else updateSheetTurno();
+      });
+      render(); setTimeout(scrollToNow, 50);
+    }
+  });
+  tick(); setInterval(tick, 20000);
+})();
+</script>
+</body>
+</html>
